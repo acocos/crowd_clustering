@@ -1,0 +1,10 @@
+#!/bin/bash
+
+echo "Setting up for iterative crowd clustering."
+mkdir hit_data/batch
+mkdir hit_data/json
+mkdir hit_data/scores
+mkdir hit_data/workerjson
+mkdir hit_data/results
+python datasetup.py -t hit_data/pp/semeval_tgtlist_rand80 —p hit_data/pp/semeval_tgtlist_rand80_multiword_xxl_PPDB2.0Score.ppsets -o hit_data/json -w hit_data/workerjson
+python create_batch.py -j hit_data/json -o hit_data/batch

@@ -1,0 +1,89 @@
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Paraphrase Clustering Interface</title>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+		<link rel="stylesheet" href="http://code.jquery.com/ui/1.11.0/themes/smoothness/jquery-ui.css">
+		<link rel="stylesheet" type="text/css" href="stylemerge.css">
+		<link href='http://fonts.googleapis.com/css?family=Open+Sans:300' rel='stylesheet' type='text/css'>
+		<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+		<script src="http://code.jquery.com/ui/1.11.0/jquery-ui.min.js"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+		<script type="text/javascript" src="ppclustmerge.js"></script>  
+	</head>
+
+	<body>
+		<section class="col-xs-12 container" id="static">
+			<!-- Instructions -->
+			<div id="title">Clustering paraphrases by sense</div>
+
+			<div class="part1" id="instructions">
+				<p>In this HIT, we loosely define <em>paraphrases</em> as words that mean approximately the same thing.</p>
+				<p>We are sorting paraphrases for the word <em>${tgt}</em> by the sense of <em>${tgt}</em> they convey. In the white box below is a set of paraphrases for <em>${tgt}</em> as they have been sorted by crowd workers before you. Each gray bin should contain a group of words that all mean approximately the same thing.</p>
+				<p>Your first task is to see whether any of these bins should be merged. Bins A and B should be merged if all the words in A mean roughly the same thing as all the words in B in some shared sense.</p>
+				<p>To merge two or more bins, select by clicking them and click &#39;Merge Selected&#39;. You can undo your work by clicking &#39;Reset&#39;.</p>
+				<p>When you are finished, move on to Part 2.</p>
+
+				<p class="flip"><u>Click to show/hide an example.</u></p>
+				<div class="togglepanel"><img alt="Example" src="https://res.cloudinary.com/dao1qifsd/image/upload/v1442288080/examplemerge_mrrfgi.png" style="width:100%;align:centered;" /></div>
+			</div>
+
+			<div class="part2" id="instructions">
+				<p>In this HIT, we loosely define <em>paraphrases</em> as words that mean approximately the same thing.</p>
+				<p>We are sorting paraphrases for the word <em>${tgt}</em> by the sense of <em>${tgt}</em> they convey. In the blue box at the left are a group of unsorted words. Your task is to sort these words by sense. When you're finished, each gray bin in the white box below should contain a group of words that all mean approximately the same thing.</p>
+				<p>In the blue box at the left are a group of unsorted words. Your task is to finish the sorting job.</p>
+				<p>You can duplicate words that belong in more than one bin using the &#39;Duplicate a Word&#39; dropdown.</p>
+				<p><span style="font-weight:bold"><u>Please note:</u></span> This HIT is graded automatically. In order to ensure that workers are completing it carefully, we have inserted one word that is completely unrelated to the target in the blue box. Please take care to <mark>place the unrelated word into the red trash bin</mark>.</p>
+
+				<p class="flip"><u>Click to show/hide an example.</u></p>
+				<div class="togglepanel"><img alt="Example" src="https://res.cloudinary.com/dao1qifsd/image/upload/v1436328603/example_iugoos.png" style="width:100%;align:centered;" /></div>
+			</div>
+
+			<div class="part1" id="subtitle">Part 1: As necessary, merge sorted bins for target word: <em>${tgt}</em></div>
+
+			<div class="part2" id="subtitle"><div class="onlyShowWithSortStage">Part 2: </div>Sort new paraphrases for target word: <em>${tgt}</em></div>
+		</section>
+
+		<section id="activearea">
+			<div class="row-fluid col-xs-12">
+				<div class="col-xs-3" id="grabbag">
+					<div class="dropdown part2"><button aria-expanded="false" aria-haspopup="true" class="btn btn-default dropdown-toggle" data-toggle="dropdown" id="duplicate" type="button">Duplicate a Word</button>
+						<ul aria-labelledby="duplicate" class="dropdown-menu"></ul>
+					</div>
+
+					<div class="part2" id="topic-box">&nbsp;</div>
+					<div class="button-wrap part1"><a class="btn btn-primary btn-xlarge" id="merge">Merge Selected</a></div>
+				</div>
+
+				<div class="col-xs-8" id="sortarea">
+					<div class="row last" id="row1">
+						<div class="col-sm-offset-0 col-sm-3">
+							<ul class="sortbin draggable"></ul>
+						</div>
+					</div>
+
+					<div class="trashbin">
+						<ul class="trash draggable part2"></ul>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<div class="row" style="padding:15px">
+			<div class="col-xs-1 button-wrap"><a class="btn btn-warning btn-xlarge" id="reset">Reset</a></div>
+			<div class="col-xs-2 col-xs-offset-7 button-wrap part1"><a class="btn btn-success btn-xlarge" id="move2">Done! Move to Part 2</a></div>
+			<div class="col-xs-2 col-xs-offset-5 button-wrap part2 onlyShowWithSortStage"><a id="move1" class="btn btn-default btn-xlarge">Back to Part 1</a></div>
+			<div class="col-xs-3 col-xs-offset-7 button-wrap part2"><a class="btn btn-success btn-xlarge" id="done">Click Here When Complete</a></div>
+			<div id="output" style="display:none;"><input name="test" style="display:none;" /> <input name="num_classes" style="display:none;" value="${num_classes}" /> <input name="num_anno" style="display:none;" value="${num_anno}" /> <input name="pos" style="display:none;" value="${pos}" /> <input name="latest_timestamp" style="display:none;" value="${latest_timestamp}" /> <input name="tgt" style="display:none;" value="${tgt}" /> <input name="bogus" style="display:none;" value="${bogus}" /> <input name="sorted" style="display:none;" value="${sorted}" /> <input name="seeded" style="display:none;" value="${seeded}" /> <input name="crowdstarter" style="display:none;" value="${crowdstarter}" /></div>
+		</div>
+
+		<div id="dialog_dup" style="display: none;" title="Duplicating words">
+			<p>You have chosen to duplicate the word . If this is an error, simply place the duplicate in the same bin as the original before submitting the HIT.</p>
+		</div>
+
+		<div id="dialog_mergeval" style="display: none;" title="Merging bins">
+			<p>Please select two or more boxes by clicking them before merging.</p>
+		</div>
+	</body>
+</html>

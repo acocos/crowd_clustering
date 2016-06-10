@@ -1,0 +1,68 @@
+<!-- STYLES -->
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css" rel="stylesheet" />
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css" rel="stylesheet" />
+<link href="https://code.jquery.com/ui/1.11.0/themes/smoothness/jquery-ui.css" rel="stylesheet" />
+<style type="text/css">#subtitle,#title{text-align:center}#title{font-size:300%}#subtitle{font-size:150%;font-weight:700}#instructions{text-align:left;padding-bottom:10px}#grabbag,#sortarea{float:left;padding:25px;margin:15px}.togglepanel{display:none}.activearea{width:100%}#sortarea{width:60%;min-height:400px;position:relative;-webkit-box-shadow:0 0 4px #000;-moz-box-shadow:0 0 4px #000;box-shadow:0 0 4px #000}.row{padding-top:10px;padding-bottom:30px}.sortbin,.trash{padding:5px;min-height:30px;min-width:150px;box-shadow:0 0 4px #000}#topic-box,.sortbin,.trash{list-style-type:none;margin-right:10px;border-radius:10px;-webkit-box-shadow:0 0 4px #000;-moz-box-shadow:0 0 4px #000}.sortbin{background:#eee;float:left}.trash{background:url(https://res.cloudinary.com/dao1qifsd/image/upload/v1438029625/Trash-can-icon_vf3afp.png) center center no-repeat #ffa3a3;background-size:30% 90%;float:right;min-height:40px}.trashbin{padding-top:10px;position:absolute;bottom:25px;right:45px}#topic-box{width:290px;min-height:90px;background:#d6ebff;float:left;padding:5px;box-shadow:0 0 4px #000}#topic-box li,.sortbin li,.trashbin li{margin:0 3px 3px 0;padding:0 3px 3px;border-radius:5px;float:left;text-align:center;background:#fff;text-indent:0}.topicWords{padding:3px;font-size:1.15em}.topics{cursor:pointer}#frame{margin-top:20px}.dropdown-toggle{margin:10px}.btn-xlarge{padding:12px 18px;font-size:24px;line-height:normal;-webkit-border-radius:8px;-moz-border-radius:8px;border-radius:8px}.button-wrap{text-align:center;padding-top:20px;padding-bottom:20px}*{font-family:'Open Sans'}
+</style>
+<!-- BODY -->
+<section class="container" id="static"><!-- Instructions -->
+<div id="title">Clustering paraphrases by sense</div>
+
+<div id="subtitle">Target word: <em>${tgt}</em></div>
+
+<div id="instructions">
+<p>In this HIT, we loosely define <em>paraphrases</em> as sets of words that mean approximately the same thing.</p>
+
+<p>In the white box on the right is a set of paraphrases for the word <em>${tgt}</em>, grouped by the sense of <em>${tgt}</em> that they convey. Bins should contain groups of words that all mean approximately the same thing in some sense.</p>
+
+<p>In the blue box at the left are a group of unsorted words. Your job is to finish the sorting task.</p>
+
+<p>You can duplicate words that belong in more than one bin using the &#39;Duplicate a Word&#39; dropdown.</p>
+
+<p><span style="font-weight:bold">Please note:</span> As a quality control measure, we have inserted one false paraphrase into the list of sortable words. Please place this false paraphrase and any other words unrelated to the target word <em>${tgt}</em> in the red trash bin at the bottom right.</p>
+
+<p class="flip"><u>Click to show/hide an example.</u></p>
+
+<div class="togglepanel"><img alt="Example" src="https://res.cloudinary.com/dao1qifsd/image/upload/v1436328603/example_iugoos.png" style="width:100%;align:centered;" /></div>
+</div>
+</section>
+
+<section id="activearea">
+<div class="row-fluid">
+<div class="span3" id="grabbag">
+<div class="dropdown span1"><button aria-expanded="false" aria-haspopup="true" class="btn btn-default dropdown-toggle" data-toggle="dropdown" id="duplicate" type="button">Duplicate a Word</button>
+
+<ul aria-labelledby="duplicate" class="dropdown-menu">
+</ul>
+</div>
+
+<div class="col-sm-offset-0 col-sm-8" id="topic-box">&nbsp;</div>
+</div>
+
+<div class="span9" id="sortarea">
+<div class="row last" id="row1">
+<div class="col-sm-offset-0 col-sm-3">
+<ul class="sortbin draggable">
+</ul>
+</div>
+</div>
+
+<div class="trashbin">
+<ul class="trash draggable">
+</ul>
+</div>
+</div>
+</div>
+</section>
+
+<div class="row">
+<div class="col-sm-offset-3 col-sm-6 button-wrap span12"><a class="btn btn-success btn-xlarge" id="done">Click Here When Complete</a></div>
+
+<div id="output"><input name="test" style="display:none;" /> <input name="num_classes" style="display:none;" value="${num_classes}" /> <input name="num_anno" style="display:none;" value="${num_anno}" /> <input name="pos" style="display:none;" value="${pos}" /> <input name="latest_timestamp" style="display:none;" value="${latest_timestamp}" /> <input name="tgt" style="display:none;" value="${tgt}" /> <input name="bogus" style="display:none;" value="${bogus}" /> <input name="unsorted" style="display:none;" value="${unsorted}" /> <input name="sorted" style="display:none;" value="${sorted}" /> <input name="seeded" style="display:none;" value="${seeded}" /></div>
+
+<div id="dialog" style="display: none;" title="Duplicating words">
+<p>You have chosen to duplicate the word <em><span id="dupWord"> </span></em>. If this is an error, simply place the duplicate in the same bin as the original before submitting the HIT.</p>
+</div>
+<!-- SCRIPTS --><script type='text/javascript' src='https://s3.amazonaws.com/mturk-public/externalHIT_v1.js'></script><script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script><script src="https://code.jquery.com/ui/1.11.0/jquery-ui.min.js"></script><script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script><script type="text/javascript">
+function check(){var s=!1;$("ul.sortbin").each(function(){0==$(this).children().length&&(s=!0)}),s||(numOfCols=numOfCols%3+1,numOfCols%3==1?(numOfRows++,$(".last").removeClass("last").after('<div id="row'+numOfRows+'" class="row last"><div class="col-sm-offset-0 col-sm-3"><ul class="droptrue sortbin"></ul></div></div>')):$(".last>div:last-child").after('<div class="col-sm-offset-1 col-sm-3"><ul class="droptrue sortbin"></ul></div>'),readyBoxes())}function initClasses(s){console.log(s),$.each(s,function(s,t){var l=t;if(numOfCols=numOfCols%3+1,numOfCols%3==1){numOfRows++;var a="";$.each(l,function(s,t){a+='<li class="ui-priority-secondary goldtopic"><span class="topicWords">'+t+"</span></li>"}),$(".last>div:last-child ul.sortbin").addClass("gold"),$(".last>div:last-child ul.sortbin").attr("id","goldclass"+s.toString()),$(".last>div:last-child ul.sortbin").append(a),$(".last").removeClass("last").after('<div id="row'+numOfRows+'" class="row last"><div class="col-sm-offset-0 col-sm-3"><ul class="droptrue sortbin"></ul></div></div>')}else{var a="";$.each(l,function(s,t){a+='<li class="ui-priority-secondary goldtopic"><span class="topicWords">'+t+"</span></li>"}),$(".last>div:last-child ul.sortbin").addClass("gold"),$(".last>div:last-child ul.sortbin").attr("id","goldclass"+s.toString()),$(".last>div:last-child ul.sortbin").append(a),$(".last>div:last-child").after('<div class="col-sm-offset-1 col-sm-3"><ul class="droptrue sortbin"></ul></div>')}readyBoxes()})}function readyBoxes(){$(".sortbin").sortable({connectWith:"ul",revert:"150",receive:check}).droppable().draggable({containment:"#sortarea"}),$(".trash").sortable({connectWith:"ul",revert:"150",receive:check}).droppable(),$("#topic-box").sortable({connectWith:"ul",revert:"150"}).droppable(),$(".goldtopic").draggable({containment:"parent"})}function showHideExample(){$(".flip").click(function(){$(".togglepanel").toggle()})}function duplicate(){$(".dup").click(function(){duplicated||($("#dupWord").append(this.id),$("#dialog").dialog(),duplicated=!0),$("#topic-box").append('<li class="ui-state-default topics"><span class="topicWords">'+this.id+"</span></li>")})}function validateForm(){$("#submitButton").click(function(){return validate?!0:(alert("Please sort all words and click the green button before pressing Submit."),!1)})}function shuffle(s){for(var t,l,a=s.length;0!==a;)l=Math.floor(Math.random()*a),a-=1,t=s[a],s[a]=s[l],s[l]=t;return s}function readyOutput(){$("#done").click(function(){if(0!=$("#topic-box").children().length)$(this).removeClass("btn-success").addClass("btn-danger"),$(this).html("You Have to Sort All Words"),setTimeout(function(){$("#done").removeClass("btn-danger").addClass("btn-success"),$("#done").html("Click Here When Complete")},3e3),validate=!1;else{var s=1;$("ul").each(function(t,l){var a;0!=$(l).children().length&&$(l).hasClass("sortbin")?(a="",$(l).children("li").each(function(s,t){a+=$(t).children("span").html()+"@!"}),$("input[name=box"+s+"]").remove(),$(l).hasClass("gold")?$("#output").append('<input name="'+$(l).attr("id")+'" value="'+a+'" style="display:none;"></input>'):($("#output").append('<input name="newbox'+s+'" value="'+a+'" style="display:none;"></input>'),s++)):$(l).hasClass("trash")&&(a="",$(l).children("li").each(function(s,t){a+=$(t).children("span").html()+"@!"}),$("input[name=trash]").remove(),$("#output").append('<input name="trash" value="'+a+'" style="display:none;"></input>'))}),$(this).html("Thanks, now you can submit the HIT"),validate=!0}console.log($("#output").html())})}var numOfRows=1,numOfCols=1,validate=!1,duplicated=!1;$(document).ready(function(){var s=${unsorted},t=s.concat(["${bogus}"]);shuffle(t),console.log(t);for(i in t)$("#topic-box").append('<li class="ui-state-default topics"><span class="topicWords">'+t[i]+"</span></li>"),$(".dropdown-menu").append('<li><a href="#" class="dup" id="'+t[i]+'">'+t[i]+"</a></li>");var l=${crowdstarter};console.log(l),$(".dropdown-toggle").dropdown(),initClasses(l),readyBoxes(),showHideExample(),duplicate(),validateForm(),readyOutput()});
+</script></div>

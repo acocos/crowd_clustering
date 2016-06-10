@@ -1,0 +1,81 @@
+<html>
+	<head>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<title>Paraphrase Clustering Interface</title>
+		<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+		<link rel="stylesheet" href="http://code.jquery.com/ui/1.11.0/themes/smoothness/jquery-ui.css">
+		<link rel="stylesheet" type="text/css" href="style.css">
+		<link href='http://fonts.googleapis.com/css?family=Open+Sans:300' rel='stylesheet' type='text/css'>
+		<script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
+		<script src="http://code.jquery.com/ui/1.11.0/jquery-ui.min.js"></script>
+		<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+		<script type="text/javascript" src="ppclust.js"></script>  
+	</head>
+
+	<body>
+		<section class="container" id="static">
+			<!-- Instructions -->
+			<div id="title">Clustering paraphrases by sense</div>
+			<div id="instructions">
+				<p>In this HIT, we loosely define <em>paraphrases</em> as sets of words that mean approximately the same thing.
+				<p>In the white box on the right is a set of paraphrases for the word <em>${tgt}</em>, grouped by the sense of <em>${tgt}</em> that they convey. Bins should contain groups of words that all mean approximately the same thing in some sense.</p>
+				<p>In the blue box at the left are a group of unsorted words. Your job is to finish the sorting task.</p>
+				<p>You can duplicate words that belong in more than one bin using the 'Duplicate a Word' dropdown.</p>
+				<p><span style="font-weight:bold"><u>Please note:</u></span> This HIT is graded automatically. In order to ensure that workers are completing it carefully, we have inserted one word that is completely unrelated to the target in the blue box. Please take care to <mark>place the unrelated word into the red trash bin</mark>.</p>
+				<button class="flip">Show/hide example.</button>
+				<div class="togglepanel">
+					<img src="https://res.cloudinary.com/dao1qifsd/image/upload/v1436328603/example_iugoos.png" alt="Example" style="width:100%;align:centered;">
+				</div>
+			</div>
+			<div id="subtitle">Target word: <em>${tgt}</em></div>
+		</section>
+		<section id="activearea">
+			<div class="row-fluid">
+				<div id="grabbag" class="span3">
+					<div class="dropdown span1">
+  						<button class="btn btn-default dropdown-toggle" type="button" id="duplicate" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+  							Duplicate a Word
+   			 				<span class="caret"></span>
+  						</button>
+  						<ul class="dropdown-menu" aria-labelledby="duplicate">
+ 						</ul>
+ 					</div>	
+			    	<div class="col-sm-offset-0 col-sm-8" id="topic-box">
+					</div>
+				</div>
+				<div id="sortarea" class="span9">
+    				<div id="row1" class="row last">
+        				<div class="col-sm-offset-0 col-sm-3">
+        					<ul class="sortbin draggable"></ul>
+        				</div>	
+    				</div>
+    				<div class="trashbin">
+    					<ul class="trash draggable"></ul>
+					</div>
+				</div>
+			</div>
+		</section>
+		<div class="row">
+			<div class="col-sm-offset-3 col-sm-6 button-wrap span12">
+				<a id="done" class="btn btn-success btn-xlarge">Click Here When Complete</a>
+			</div>
+			<div id="output" style="display:none;">
+				<input name="test" style="display:none;">
+				<input name="num_classes" value="${num_classes}" style="display:none;">
+				<input name="num_anno" value="${num_anno}" style="display:none;">
+				<input name="pos" value="${pos}" style="display:none;">
+				<input name="latest_timestamp" value="${latest_timestamp}" style="display:none;">
+				<input name="tgt" value="${tgt}" style="display:none;">
+				<input name="bogus" value="${bogus}" style="display:none;">
+				<input name="unsorted" value="${unsorted}" style="display:none;">
+				<input name="sorted" value="${sorted}" style="display:none;">
+				<input name="seeded" value="${seeded}" style="display:none;">
+				<input name="crowdstarter" value="${crowdstarter}" style="display:none;">
+			</div>
+		</div>
+		<div id="dialog" title="Duplicating words" style="display: none;">
+  			<p>You have chosen to duplicate the word <em><span id="dupWord"></span></em>. If this is an error, simply place the duplicate in the same bin as the original before submitting the HIT.</p>
+		</div>
+	</body>
+</html>

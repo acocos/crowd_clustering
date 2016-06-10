@@ -1,0 +1,8 @@
+#!/bin/bash
+
+echo "Reset files and directories."
+
+rm hit_data/batch/*
+rm hit_data/json/*
+rm hit_data/results/*
+rm hit_data/workerjson/*

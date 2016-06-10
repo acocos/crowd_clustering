@@ -1,0 +1,6 @@
+#!/bin/bash
+
+echo "Reviewing results from last round of HITs..."
+python process_results_noseed.py -j hit_data/json -r hit_data/results -w hit_data/workerjson -c biconnected
+echo "Creating new batch..."
+python create_batch.py -j hit_data/json -o hit_data/batch
