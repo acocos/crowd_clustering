@@ -4,7 +4,7 @@
 # process_results_noseed.py
 #
 # Pull latest results for paraphrase clustering HIT from
-# AMT results file, calculate worker accuracy, and update json 
+# AMT results file, calculate worker accuracy, and update json
 # files with results
 #
 # - For each worker, calculate accuracy at classifying
@@ -116,7 +116,7 @@ if __name__ == "__main__":
     optparser.add_option("-j", "--jsondir", type="string", default='hit_data/json', dest="jsondir", help="Directory containing paraphrase set json files")
     optparser.add_option("-r", "--resultsdirfile", type="string", default='hit_data/results', dest="resultsdirfile", help="Results directory (picks most recently updated) or .csv file")
     optparser.add_option("-w", "--workerdir", type="string", default='hit_data/workerjson', dest="workerdir")
-    optparser.add_option("-c", "--clustermode", type="string", default='clique', dest="clustermode", help="Mode for clustering terms: 'biconnected' or 'clique'")
+    optparser.add_option("-c", "--clustermode", type="string", default='biconnected', dest="clustermode", help="Mode for clustering terms: 'biconnected' or 'clique'")
 
     (opts, _) = optparser.parse_args()
 
@@ -170,6 +170,9 @@ if __name__ == "__main__":
                 batchworkers[wid]['incorrect'] += 1
                 batchworkers[wid]['incorrect_hits'].append(hit_id)
                 batchworkers[wid]['incorrect_assignments'].append(a_id)
+        else:
+            print 'Ignoring AssignmentId %s (status is "%s", should be "Submitted" to process it)' \
+                  % (str(row['AssignmentId']), row['AssignmentStatus'])
 
     ## Update worker records
     with open(max(glob.iglob(opts.workerdir+'/*workers.json')), 'rU') as fin:
@@ -190,70 +193,70 @@ if __name__ == "__main__":
     output_data = []
     errcount = {t:0 for t in targets}
     for row in results:
-        if row['AssignmentStatus'] == 'Submitted':
-			## Record hit data
-			tgt = row['Answer.tgt']
-			pos = row['Answer.pos']
-			jsonfilename = '.'.join([tgt,pos])
-			bogus = row['Answer.bogus']
-			hit_id = row['HITId']
-			latest_timestamp = row['Answer.latest_timestamp']
-			if jsonfilename not in correct_submissions:
-				correct_submissions[jsonfilename] = 0
-			## Reject if assignment incorrect or worker in blacklist, otherwise accept
-			wid = row['WorkerId']
-			a_id = row['AssignmentId']
-			if wid not in blacklist:
-				row['Approve'] = 'X'
-				if a_id in bogalone_assignments or a_id in bad_trash:
-					row['RequesterFeedback'] = settings['APPROVE_FEEDBACK_BOGALONE'] %(bogus, tgt)
-				else:
-					row['RequesterFeedback'] = settings['APPROVE_FEEDBACK']
-				correct_submissions[jsonfilename] += 1
+        if row['AssignmentStatus'] == 'Submitted':  # only check new entries
+            ## Record hit data
+            tgt = row['Answer.tgt']
+            pos = row['Answer.pos']
+            jsonfilename = '.'.join([tgt,pos])
+            bogus = row['Answer.bogus']
+            hit_id = row['HITId']
+            latest_timestamp = row['Answer.latest_timestamp']
+            if jsonfilename not in correct_submissions:
+                correct_submissions[jsonfilename] = 0
+            ## Reject if worker in blacklist, otherwise accept. If worker did not correctly
+            ## sort bogus word, give them a warning and ignore the result.
+            wid = row['WorkerId']
+            a_id = row['AssignmentId']
+            if wid not in blacklist:
+                row['Approve'] = 'X'
+                if a_id in bogalone_assignments or a_id in bad_trash:
+                    row['RequesterFeedback'] = settings['APPROVE_FEEDBACK_BOGALONE'] %(bogus, tgt)
+                else:
+                    row['RequesterFeedback'] = settings['APPROVE_FEEDBACK']
+                if a_id in bad_trash:
+                    continue
+                else:
+                    correct_submissions[jsonfilename] += 1
 
-				## Process worker's clustering solution
-				with open(os.path.join(opts.jsondir, jsonfilename),'rU') as fin:
-					oldjson = byteify(json.load(fin))
-				unsorted = set(oldjson['unsorted'])
-				# unsorted = set([l.strip() for l in row['Answer.unsorted'].split('|')[-1].replace('[','').replace(']','').split(', ')])
-				# unsorted = set(strtolist(row['Input.unsorted']))
-				cluster_assignments = {w: set([]) for w in unsorted}
-				merges = []
-				for key,ans in row.iteritems():
-					if 'goldclass' in key or 'newbox' in key or 'trash' in key:
-						contents = set(ans.strip().split('|')[0].split('@!')) - {bogus} - {''}
-						if 'newbox' in key:
-							cname = 'newbox'
-						else:
-							cname = key.replace('Answer.','')
-						for word in contents & unsorted:
-							cluster_assignments[word].add((cname, frozenset(contents)))
-					elif 'merged' in key and len(ans.strip()) > 0:
-						merges.append(frozenset([item for sublist in [m.split('|') for m in ans.strip().split(',')] for item in sublist]))
-
-
-				for word, assgn in cluster_assignments.iteritems():
-					try:
-						oldjson['ppset']['pp_dict'][word]['workers'].append(wid)
-					except KeyError:
-						print jsonfilename, unsorted, word, assgn
-					for clus, contents in assgn:
-						try:
-							oldjson['ppset']['pp_dict'][word]['matches'][clus].append(contents)
-						except KeyError:
-							oldjson['ppset']['pp_dict'][word]['matches'][clus] = [contents]
-				for mrg in merges:
-					try:
-						oldjson['crowd_gold']['merges'][str(list(mrg))] += 1
-					except KeyError:
-						oldjson['crowd_gold']['merges'][str(list(mrg))] = 1
-				with open(os.path.join(opts.jsondir, jsonfilename), 'w') as fout:
-					print >> fout, json.dumps(oldjson, indent=2, default=jdefault)
-			else:
-				row['Reject'] = settings['REJECT_BLACKLIST']\
-								%(WORKER_ACC_THRESHOLD,
-								batchworkers[wid]['correct'],
-								batchworkers[wid]['incorrect'])
+                ## Process worker's clustering solution
+                with open(os.path.join(opts.jsondir, jsonfilename),'rU') as fin:
+                    oldjson = byteify(json.load(fin))
+                unsorted = set(oldjson['unsorted'])
+                cluster_assignments = {w: set([]) for w in unsorted}
+                merges = []
+                for key,ans in row.iteritems():
+                    if 'goldclass' in key or 'newbox' in key or 'trash' in key:
+                        contents = set(ans.strip().split('|')[0].split('@!')) - {bogus} - {''}
+                        if 'newbox' in key:
+                            cname = 'newbox'
+                        else:
+                            cname = key.replace('Answer.','')
+                        for word in contents & unsorted:
+                            cluster_assignments[word].add((cname, frozenset(contents)))
+                    elif 'merged' in key and len(ans.strip()) > 0:
+                        merges.append(frozenset([item for sublist in [m.split('|') for m in ans.strip().split(',')] for item in sublist]))
+                for word, assgn in cluster_assignments.iteritems():
+                    try:
+                        oldjson['ppset']['pp_dict'][word]['workers'].append(wid)
+                    except KeyError:
+                        print jsonfilename, unsorted, word, assgn
+                    for clus, contents in assgn:
+                        try:
+                            oldjson['ppset']['pp_dict'][word]['matches'][clus].append(contents)
+                        except KeyError:
+                            oldjson['ppset']['pp_dict'][word]['matches'][clus] = [contents]
+                for mrg in merges:
+                    try:
+                        oldjson['crowd_gold']['merges'][str(list(mrg))] += 1
+                    except KeyError:
+                        oldjson['crowd_gold']['merges'][str(list(mrg))] = 1
+                with open(os.path.join(opts.jsondir, jsonfilename), 'w') as fout:
+                    print >> fout, json.dumps(oldjson, indent=2, default=jdefault)
+            else:
+                row['Reject'] = settings['REJECT_BLACKLIST']\
+                                %(WORKER_ACC_THRESHOLD,
+                                batchworkers[wid]['correct'],
+                                batchworkers[wid]['incorrect'])
 
         output_data.append(row)
 
@@ -275,15 +278,14 @@ if __name__ == "__main__":
 
 
     ## Check if any words have received enough annotations to add to crowd gold
+    req_anno = settings['REDUNDANCY']
     for t in targets:
         clus_this_rnd = set([])
         with open(os.path.join(opts.jsondir, t),'rU') as fin:
             thisjson = byteify(json.load(fin))
-        req_anno = settings['REDUNDANCY']
         if correct_submissions[t] < req_anno:  # skip files that had one or more rejections
             continue
         print 'Target word', t, 'Bogus term', thisjson['bogusword'], 'Errors', errcount[t]
-
         newclus = nx.Graph()
 
         max_attempts_reached = set([])
@@ -388,7 +390,7 @@ if __name__ == "__main__":
         thisjson['crowd_gold']['cluster_count'] = len(thisjson['crowd_gold']['sense_clustering'])
 
         ## Reset HIT for this target and record old data
-        if 'old_data' not in thisjson:
+        if 'old_data' not in thisjson or len(thisjson['old_data']) == 0:
             thisjson['old_data'] = {}
         thisjson['old_data'][timestamp] = {k: deepcopy(thisjson[k]) for k in ['ppset','crowd_gold',
                                                                     'crowdstarter','unsorted',
