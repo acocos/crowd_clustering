@@ -70,6 +70,12 @@ Optionally, you may seed the first sort round of the HIT using a set of gold sta
 
 In order to actually run the HIT on AMT, you need to update the `settings.py` file with your own AMT credentials. 
 
+Importantly, you should also update these settings as appropriate:
+
+`REDUNDANCY`: The number of workers you need to cluster each target word before processing the results
+`CLUSTER_AGR_THRESHOLD`: The percentage of workers who must agree on a paraphrase's placement before adding it to a gold cluster
+`MERGE_THRESHOLD`: The percentage of workers who must agree to merge two clusters
+
 
 ### Step 3. Initialize
 To initialize the clustering data, run
