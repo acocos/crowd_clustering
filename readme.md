@@ -72,8 +72,10 @@ In order to actually run the HIT on AMT, you need to update the `settings.py` fi
 
 Importantly, you should also update these settings as appropriate:
 
-`REDUNDANCY`: The number of workers you need to cluster each target word before processing the results
+`REDUNDANCY`: The number of workers you need to cluster each target word before processing the results. NOTE: This should be the same as the number of workers you assign to each HIT in AMT.
+
 `CLUSTER_AGR_THRESHOLD`: The percentage of workers who must agree on a paraphrase's placement before adding it to a gold cluster
+
 `MERGE_THRESHOLD`: The percentage of workers who must agree to merge two clusters
 
 

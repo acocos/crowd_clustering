@@ -204,7 +204,9 @@ if __name__ == "__main__":
             if jsonfilename not in correct_submissions:
                 correct_submissions[jsonfilename] = 0
             ## Reject if worker in blacklist, otherwise accept. If worker did not correctly
-            ## sort bogus word, give them a warning and ignore the result.
+            ## sort bogus word, give them a warning; still accept the result, since
+            ## it enables us to keep HIT iterations atomic and shouldn't significantly impact
+            ## the result (assuming very few bad HITs per target per round)
             wid = row['WorkerId']
             a_id = row['AssignmentId']
             if wid not in blacklist:
@@ -213,10 +215,7 @@ if __name__ == "__main__":
                     row['RequesterFeedback'] = settings['APPROVE_FEEDBACK_BOGALONE'] %(bogus, tgt)
                 else:
                     row['RequesterFeedback'] = settings['APPROVE_FEEDBACK']
-                if a_id in bad_trash:
-                    continue
-                else:
-                    correct_submissions[jsonfilename] += 1
+                correct_submissions[jsonfilename] += 1
 
                 ## Process worker's clustering solution
                 with open(os.path.join(opts.jsondir, jsonfilename),'rU') as fin:
